@@ -1,0 +1,5 @@
+{
+  "name": "Pixel Barbershop",
+  "description": "Professional video display platform for Pixel Barbershop with auto-fullscreen and default auto-looping playback.",
+  "requestFramePermissions": []
+}
