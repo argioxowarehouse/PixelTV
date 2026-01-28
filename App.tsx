@@ -9,7 +9,6 @@ const DEFAULT_VIDEO_URL = 'https://res.cloudinary.com/djthxc5gz/video/upload/v17
 
 const App: React.FC = () => {
   const [videoUrl, setVideoUrl] = useState<string>(DEFAULT_VIDEO_URL);
-  // Set default to true for auto-loop as requested
   const [loopEnabled, setLoopEnabled] = useState<boolean>(true);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
@@ -17,7 +16,6 @@ const App: React.FC = () => {
   
   const playerContainerRef = useRef<HTMLDivElement>(null);
 
-  // Initialize from local storage
   useEffect(() => {
     const savedLink = localStorage.getItem(StorageKeys.VIDEO_SOURCE);
     const savedLoop = localStorage.getItem(StorageKeys.VIDEO_LOOP);
@@ -25,15 +23,12 @@ const App: React.FC = () => {
     if (savedLink) {
       setVideoUrl(savedLink);
     } else {
-      // If no saved link, we use the default and save it for future sessions
       localStorage.setItem(StorageKeys.VIDEO_SOURCE, DEFAULT_VIDEO_URL);
     }
     
-    // If there's a saved setting, use it. Otherwise, keep the default (true)
     if (savedLoop !== null) {
       setLoopEnabled(savedLoop === 'true');
     } else {
-      // Initialize storage with true if first time
       localStorage.setItem(StorageKeys.VIDEO_LOOP, 'true');
     }
   }, []);
@@ -54,10 +49,6 @@ const App: React.FC = () => {
           await elem.requestFullscreen();
         } else if ((elem as any).webkitRequestFullscreen) {
           await (elem as any).webkitRequestFullscreen();
-        } else if ((elem as any).mozRequestFullScreen) {
-          await (elem as any).mozRequestFullScreen();
-        } else if ((elem as any).msRequestFullscreen) {
-          await (elem as any).msRequestFullscreen();
         }
       } catch (err) {
         console.warn("Fullscreen request failed:", err);
@@ -73,7 +64,6 @@ const App: React.FC = () => {
     setIsLoading(true);
     setIsPlaying(true);
     
-    // Auto-fullscreen on play
     setTimeout(() => {
       requestFullscreen();
     }, 50);
@@ -104,10 +94,8 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen relative flex flex-col items-center justify-center p-4 overflow-hidden selection:bg-[#0c7565] selection:text-white">
-      {/* Brand-Specific Gradient Background */}
       <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0c7565]/20 via-[#020202] to-black"></div>
       
-      {/* Header / Nav */}
       {!isPlaying && (
         <header className="fixed top-0 left-0 right-0 p-8 flex justify-between items-center z-40 animate-in fade-in duration-700">
           <div className="flex items-center gap-4">
@@ -128,12 +116,10 @@ const App: React.FC = () => {
         </header>
       )}
 
-      {/* Main Content */}
       <main className="w-full h-full flex flex-col items-center justify-center">
         {!isPlaying ? (
           <div className="text-center space-y-10 animate-in fade-in slide-in-from-bottom-12 duration-1000 max-w-5xl px-4">
             <div className="relative inline-block">
-              {/* Pulsing Aura */}
               <div className="absolute inset-0 bg-[#0c7565] rounded-full blur-[100px] opacity-20 animate-pulse"></div>
               
               <button
@@ -187,6 +173,8 @@ const App: React.FC = () => {
                   className="w-full h-full object-contain"
                   controls
                   autoPlay
+                  muted
+                  playsInline
                   loop={loopEnabled}
                   onLoadedData={() => setIsLoading(false)}
                 />
