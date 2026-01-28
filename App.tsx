@@ -5,7 +5,15 @@ import SettingsModal from './components/SettingsModal';
 import { getPlayerSource, isValidVideoLink } from './utils/videoUtils';
 import { StorageKeys } from './types';
 
-const DEFAULT_VIDEO_URL = 'https://res.cloudinary.com/djthxc5gz/video/upload/v1769485310/TV_Pixel_Juli-new_acio0x.mp4';
+const DEFAULT_VIDEO_URL = `<iframe
+  src="https://player.cloudinary.com/embed/?cloud_name=djthxc5gz&public_id=TV_Pixel_Juli_webm_fhq8cp"
+  width="640"
+  height="360" 
+  style="height: auto; width: 100%; aspect-ratio: 640 / 360;"
+  allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+  allowfullscreen
+  frameborder="0"
+></iframe>`;
 
 const App: React.FC = () => {
   const [videoUrl, setVideoUrl] = useState<string>(DEFAULT_VIDEO_URL);

@@ -12,7 +12,7 @@ export const getVideoProvider = (url: string): VideoProvider => {
     return 'youtube';
   }
   
-  if (lowerUrl.includes('cloudinary.com')) {
+  if (lowerUrl.includes('cloudinary.com') || lowerUrl.includes('player.cloudinary.com')) {
     return 'cloudinary';
   }
   
@@ -51,10 +51,18 @@ export const getPlayerSource = (url: string, loop: boolean = false) => {
             extractedSrc += `&loop=1&playlist=${videoId}`;
           }
         }
+      } 
+      // Penanganan khusus untuk Cloudinary Player Embed
+      else if (extractedSrc.includes('player.cloudinary.com')) {
+        const sep = extractedSrc.includes('?') ? '&' : '?';
+        if (!extractedSrc.includes('autoplay')) extractedSrc += `${sep}autoplay=true`;
+        if (loop && !extractedSrc.includes('loop')) {
+          extractedSrc += `&loop=true`;
+        }
       }
       
       return {
-        type: 'youtube' as const, // Gunakan renderer iframe
+        type: 'youtube' as const, // Render as Iframe
         url: extractedSrc
       };
     }
