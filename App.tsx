@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { PlayIcon, SettingsIcon, XIcon, InfoIcon, BrandLogo } from './components/Icons';
+import { PlayIcon, SettingsIcon, XIcon, BrandLogo } from './components/Icons';
 import SettingsModal from './components/SettingsModal';
 import { getPlayerSource, isValidVideoLink } from './utils/videoUtils';
 import { StorageKeys } from './types';
@@ -23,7 +23,9 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   
   const playerContainerRef = useRef<HTMLDivElement>(null);
+  const playButtonRef = useRef<HTMLButtonElement>(null);
 
+  // Initialize from local storage
   useEffect(() => {
     const savedLink = localStorage.getItem(StorageKeys.VIDEO_SOURCE);
     const savedLoop = localStorage.getItem(StorageKeys.VIDEO_LOOP);
@@ -39,6 +41,9 @@ const App: React.FC = () => {
     } else {
       localStorage.setItem(StorageKeys.VIDEO_LOOP, 'true');
     }
+
+    // Auto-focus play button for TV remote users
+    setTimeout(() => playButtonRef.current?.focus(), 500);
   }, []);
 
   const handleSaveSettings = (url: string, loop: boolean) => {
@@ -47,6 +52,8 @@ const App: React.FC = () => {
     localStorage.setItem(StorageKeys.VIDEO_SOURCE, url);
     localStorage.setItem(StorageKeys.VIDEO_LOOP, String(loop));
     setIsPlaying(false);
+    // Refocus after closing settings
+    setTimeout(() => playButtonRef.current?.focus(), 100);
   };
 
   const requestFullscreen = async () => {
@@ -72,9 +79,10 @@ const App: React.FC = () => {
     setIsLoading(true);
     setIsPlaying(true);
     
+    // Attempt fullscreen for immersive TV experience
     setTimeout(() => {
       requestFullscreen();
-    }, 50);
+    }, 100);
   };
 
   const exitFullscreen = () => {
@@ -82,6 +90,7 @@ const App: React.FC = () => {
       document.exitFullscreen().catch(() => {});
     }
     setIsPlaying(false);
+    setTimeout(() => playButtonRef.current?.focus(), 100);
   };
 
   useEffect(() => {
@@ -101,115 +110,116 @@ const App: React.FC = () => {
   const source = getPlayerSource(videoUrl, loopEnabled);
 
   return (
-    <div className="min-h-screen relative flex flex-col items-center justify-center p-4 overflow-hidden selection:bg-[#0c7565] selection:text-white">
-      <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0c7565]/20 via-[#020202] to-black"></div>
+    <div className="h-screen w-screen relative flex flex-col items-center justify-center overflow-hidden selection:bg-[#0c7565] selection:text-white bg-black">
+      {/* Immersive Background */}
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0c7565]/15 via-[#020202] to-black"></div>
       
       {!isPlaying && (
-        <header className="fixed top-0 left-0 right-0 p-8 flex justify-between items-center z-40 animate-in fade-in duration-700">
-          <div className="flex items-center gap-4">
-            <BrandLogo className="h-10 w-10 text-[#0c7565]" />
-            <div>
-              <h1 className="text-2xl font-black tracking-tight leading-none uppercase">Pixel <span className="text-[#0c7565]">Barbershop</span></h1>
-              <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Premium Display Engine</p>
-            </div>
-          </div>
-          
-          <button
-            onClick={() => setShowSettings(true)}
-            className="p-3 glass rounded-2xl hover:bg-white/10 transition-all hover:scale-105 active:scale-95 group border border-white/10"
-            title="Settings"
-          >
-            <SettingsIcon className="w-6 h-6 text-gray-400 group-hover:text-[#0c7565] transition-colors" />
-          </button>
-        </header>
-      )}
-
-      <main className="w-full h-full flex flex-col items-center justify-center">
-        {!isPlaying ? (
-          <div className="text-center space-y-10 animate-in fade-in slide-in-from-bottom-12 duration-1000 max-w-5xl px-4">
-            <div className="relative inline-block">
-              <div className="absolute inset-0 bg-[#0c7565] rounded-full blur-[100px] opacity-20 animate-pulse"></div>
-              
-              <button
-                onClick={togglePlay}
-                className="relative z-10 w-40 h-40 md:w-56 md:h-56 bg-white/5 border border-white/10 backdrop-blur-3xl rounded-full flex items-center justify-center text-white shadow-2xl transition-all hover:scale-110 active:scale-90 hover:border-[#0c7565]/50 hover:bg-[#0c7565]/10 group"
-              >
-                <PlayIcon className="w-20 h-20 md:w-28 md:h-28 translate-x-1.5 text-white group-hover:text-[#0c7565] transition-colors" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex justify-center mb-6">
-                 <BrandLogo className="h-24 w-24 text-white" />
+        <>
+          <header className="fixed top-0 left-0 right-0 p-12 flex justify-between items-center z-40 animate-in fade-in duration-1000">
+            <div className="flex items-center gap-6">
+              <BrandLogo className="h-16 w-16 text-[#0c7565]" />
+              <div>
+                <h1 className="text-4xl font-black tracking-tight leading-none uppercase">
+                  Pixel <span className="text-[#0c7565]">Barbershop</span>
+                </h1>
+                <p className="text-sm text-gray-500 uppercase tracking-[0.3em] mt-2">Display Engine v2.0</p>
               </div>
-              <h2 className="text-4xl md:text-7xl font-black text-white tracking-tighter uppercase">
-                Pixel <span className="text-[#0c7565]">Barbershop</span>
-              </h2>
-              <p className="text-gray-400 text-lg md:text-xl font-light max-w-2xl mx-auto">
-                {videoUrl ? (
-                  <>Layar siap tayang. {loopEnabled && <span className="text-[#0c7565] font-semibold tracking-wide">AUTO-LOOP AKTIF</span>}</>
-                ) : (
-                  "Masukkan URL video promosi barbershop Anda di menu pengaturan."
-                )}
-              </p>
             </div>
-          </div>
-        ) : (
-          <div 
-            ref={playerContainerRef}
-            className="w-full h-full max-w-none bg-black flex items-center justify-center relative animate-in zoom-in-95 duration-700"
-          >
-            {isLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/90 z-10">
-                <div className="w-16 h-16 border-4 border-[#0c7565]/20 border-t-[#0c7565] rounded-full animate-spin"></div>
-              </div>
-            )}
-            
-            {source ? (
-              source.type === 'youtube' ? (
-                <iframe
-                  src={source.url}
-                  className="w-full h-full border-none"
-                  allow="autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                  onLoad={() => setIsLoading(false)}
-                  title="Player"
-                  allowFullScreen
-                ></iframe>
-              ) : (
-                <video
-                  src={source.url}
-                  className="w-full h-full object-contain"
-                  controls
-                  autoPlay
-                  muted
-                  playsInline
-                  loop={loopEnabled}
-                  onLoadedData={() => setIsLoading(false)}
-                />
-              )
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full text-center p-8">
-                <p className="text-red-400 font-medium mb-4 text-xl">Sumber video tidak valid.</p>
-                <button onClick={() => { exitFullscreen(); setShowSettings(true); }} className="px-6 py-3 bg-[#0c7565] rounded-xl text-white font-bold hover:bg-[#0a6053] transition-all">Ganti Link</button>
-              </div>
-            )}
             
             <button
-              onClick={exitFullscreen}
-              className="absolute top-6 right-6 p-3 bg-black/40 hover:bg-[#0c7565] rounded-2xl text-white backdrop-blur-xl transition-all opacity-0 group-hover:opacity-100 z-50 border border-white/10"
+              onClick={() => setShowSettings(true)}
+              className="p-5 glass rounded-3xl hover:bg-white/10 transition-all hover:scale-110 focus:bg-[#0c7565]/20 border border-white/10 group"
+              aria-label="Settings"
             >
-              <XIcon className="w-6 h-6" />
+              <SettingsIcon className="w-10 h-10 text-gray-400 group-hover:text-white transition-colors" />
             </button>
-          </div>
-        )}
-      </main>
+          </header>
 
-      {!isPlaying && (
-        <footer className="fixed bottom-8 left-0 right-0 text-center pointer-events-none animate-in fade-in duration-1000">
-          <p className="text-[#0c7565] text-[11px] font-black uppercase tracking-[0.4em] opacity-50">
-            Professional Barbershop Display Solution
-          </p>
-        </footer>
+          <main className="w-full flex flex-col items-center justify-center mt-20">
+            <div className="text-center space-y-12 animate-in fade-in slide-in-from-bottom-12 duration-1000">
+              <div className="relative inline-block">
+                <div className="absolute inset-0 bg-[#0c7565] rounded-full blur-[120px] opacity-30 animate-pulse"></div>
+                
+                <button
+                  ref={playButtonRef}
+                  onClick={togglePlay}
+                  className="play-pulse relative z-10 w-64 h-64 bg-white/5 border-2 border-white/10 backdrop-blur-3xl rounded-full flex items-center justify-center text-white shadow-2xl transition-all hover:scale-110 active:scale-95 focus:border-[#0c7565] focus:bg-[#0c7565]/20 group"
+                >
+                  <PlayIcon className="w-32 h-32 translate-x-2 text-white group-hover:text-[#0c7565] transition-colors" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <h2 className="text-6xl md:text-8xl font-black text-white tracking-tighter uppercase leading-none">
+                  READY <span className="text-[#0c7565]">TO PLAY</span>
+                </h2>
+                <div className="flex items-center justify-center gap-4 py-2 px-6 bg-white/5 border border-white/10 rounded-full inline-flex mx-auto">
+                  <div className="w-3 h-3 bg-[#0c7565] rounded-full animate-ping"></div>
+                  <p className="text-gray-300 text-2xl font-medium tracking-wide">
+                    {loopEnabled ? "AUTO-LOOP AKTIF" : "SINGLE PLAY"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </main>
+
+          <footer className="fixed bottom-12 left-0 right-0 text-center animate-in fade-in duration-1000 opacity-40">
+            <p className="text-[#0c7565] text-sm font-black uppercase tracking-[0.5em]">
+              SISTEM TAMPILAN PROFESIONAL PIXEL BARBERSHOP
+            </p>
+          </footer>
+        </>
+      )}
+
+      {isPlaying && (
+        <div 
+          ref={playerContainerRef}
+          className="w-full h-full bg-black flex items-center justify-center relative animate-in zoom-in-95 duration-700 overflow-hidden"
+        >
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
+              <div className="w-24 h-24 border-8 border-[#0c7565]/20 border-t-[#0c7565] rounded-full animate-spin"></div>
+              <p className="absolute mt-40 text-[#0c7565] font-bold text-2xl tracking-widest animate-pulse">MEMUAT VIDEO...</p>
+            </div>
+          )}
+          
+          {source ? (
+            source.type === 'youtube' ? (
+              <iframe
+                src={source.url}
+                className="w-full h-full border-none pointer-events-auto"
+                allow="autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                onLoad={() => setIsLoading(false)}
+                title="Pixel Barbershop Player"
+                allowFullScreen
+              ></iframe>
+            ) : (
+              <video
+                src={source.url}
+                className="w-full h-full object-contain"
+                controls
+                autoPlay
+                muted
+                playsInline
+                loop={loopEnabled}
+                onLoadedData={() => setIsLoading(false)}
+              />
+            )
+          ) : (
+            <div className="text-center p-12">
+              <p className="text-red-500 text-3xl font-bold mb-8">Video tidak dapat dimuat.</p>
+              <button onClick={exitFullscreen} className="px-10 py-5 bg-[#0c7565] rounded-2xl text-white text-2xl font-black uppercase focus:scale-110">Kembali</button>
+            </div>
+          )}
+          
+          <button
+            onClick={exitFullscreen}
+            className="absolute top-10 right-10 p-5 bg-black/50 hover:bg-[#0c7565] rounded-3xl text-white backdrop-blur-2xl transition-all opacity-0 hover:opacity-100 focus:opacity-100 z-50 border border-white/20"
+          >
+            <XIcon className="w-10 h-10" />
+          </button>
+        </div>
       )}
 
       {showSettings && (
