@@ -1,5 +1,5 @@
 {
-  "name": "Pixel Barbershop",
-  "description": "Professional video display platform for Pixel Barbershop with auto-fullscreen and default auto-looping playback.",
+  "name": "Pixel TV",
+  "description": "Professional video display platform for Pixel TV with auto-fullscreen and default auto-looping playback.",
   "requestFramePermissions": []
 }

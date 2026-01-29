@@ -1,14 +1,16 @@
 
-export interface AppState {
-  videoUrl: string;
-  isPlaying: boolean;
-  showSettings: boolean;
-  loopEnabled: boolean;
+export interface VideoItem {
+  id: string;
+  title: string;
+  url: string;
+  loop: boolean;
 }
 
+export type ViewState = 'main' | 'admin' | 'player';
+
 export enum StorageKeys {
-  VIDEO_SOURCE = 'cloudinary_cinema_source',
-  VIDEO_LOOP = 'cloudinary_cinema_loop'
+  VIDEO_LIST = 'pixel_barber_videos',
+  GLOBAL_SETTINGS = 'pixel_barber_settings'
 }
 
 export type VideoProvider = 'youtube' | 'cloudinary' | 'direct' | 'unknown';
